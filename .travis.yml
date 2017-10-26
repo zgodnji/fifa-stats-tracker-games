@@ -1,6 +1,23 @@
+sudo: required
+
+services:
+  - docker
+
 language: java
 
-script:
-  - mvn clean package
-  - docker build -t "gamesimage" .
-  - docker run -p 8082:8082 gamesimage
+env:
+  global:
+    - secure: "CTayGJ0cAd02h0s4e3CyczP8Pux9Lz9KgOUyNsyIzdAblfDh2yJwoe7F85JCu+nHXsGuNdFtUMpzl3W3Szgqh+8QLUbKFs4EF5q8axqO6qF8w+cpwuBF2PPgr3VGW2aJ7r/uRRdrcu76pt2GxCtMydDiEylp83/YlBUxVDNrvAp02+rBHLK20Sk8KFlEZBgSP8imKHYG3k1H+5lZiebCTvBoK1MxJdMi5t3uThHeefIMlApaWnYudk5PrsLEk3fKRxTMxaN/9BMVKIclIKKURGzeBWClCSW9NBP9zRXkxq1oBo7ApXXdPzh3JT/d6pEc5tULhz6uI0G4xiUyqflcFpBmA1di8sieexFkO2iBArL3wkZDHuBojNThUKt5vcwSp8R0Qsq/eWFFniWgFo4d+sk/rjTcKvrus3dfaDt3aqqIHZuSZ9U6vzmDXq7tBsvZY0YK66D31EWqncSLy8g266qfGxE1IzKBIj+Kmy6/hDcJRPfKyvbo67CtZFaogQZ4I81CaXvlyOs/W5Yna0Vfc9YAnIOEQlC8eFru+a55SGo2f7sI6OYuCPoRHAflB4HAaQs9JEv3cPh4bHmXbTvPzk0wJ6CYL+M9GOt1IVUMF1LZsyAConbugFv5RTFY1/Exeqnbm8iUjyuLOO9LOzJPVaBSJMFM3SkgyH5Cq0ZQXbQ=" # DOCKER_EMAIL
+    - secure: "kMygInJORAZNv/BByCYK/LWyf5nJ3cz9HUgAjdqPCQ7Y5U6X1xpYJNjr8m07GEpUCb7Ji9YArtVF4wCD72/eDFirRpgaBk4KcfdfhGbIJxYVrwrsbbLEiu4yJVnj+Mj9eerzDEUJGF0FmAn+7MMUvY6+cuigcRmmqQHzb9mn/SyV3MoikylfrpPSGKIBUEWXPtF4gHVS03Eklj45Dopkkr49tVxG34rS4gE0ub1/JSjia1SLoi/NJ1lJVEEs+jpbqS31ybzefW+OIUAoyuPP2ZNK836OTBjgH2O9JV03obA6uvYxH5IYFJdBrHcy3OwnJcL+v6QMGJ6eaKDRMX+pGquM82Ffd/mP51OIWcKF3UFUfeZnoYmOWm/fRvRibCyi9ecU2lR5MChr0lbt36sxtY3obFNEWXPlbWBnSGIZpfZGjcdJdJQCSe/x2qq44GB4RRkpqg9e6Q5uyN8e3GjUrAZ9kU8vzrgCeu9kGbDwuFymV9c6kDyAYO4jr7K/jZWj2J51fXZ+j3I/q4P0ze0Izfuib81dm4B1BzmkBxbIDYv7sE3fDK1aSM6mf9/MYkY1nHWSjqKkfzEix5xPnHTsaoTtBdsaOEZNfSW6vd3tSo0wzK0Rrtjg7WEir5yRcC/UsgastcZgkdLaLCPqd6KLvTHQviZBBRcR6Q1hjTwPbdA=" # DOCKER_USER
+    - secure: "tVrlB8epunDTZ174NuCsxgGLMV8+muwDc9SWPZGflHNJIUf6oMhUJaNedz5DJa5QKWLcKv5+KNeJ1WUjSjuNBK7FotQ7BhpLuHucPkPGeF+uDphPNGEnPG2UIBR7tHTl8V3gajGwFieZE6VWH6p4kexfDdDNIg9+6uW+dGx0M9ICyTy0dmr97WvvL9AlajugDawgWkxEndhdWBDjNOmt2FJq06mhugJhlJlBmIx6NmI9BN8fr8KD9RBcqwlrTYJ1+jHW2T1SgtzLZpY5TDKx5+mBOnKEcoL9N+mf91TLc75AnyMXDoX+CFnDbTOri4Zu57SX1KJhUydVQNT1i6y3uvjt5JVeyDdhXiN94cn6Rgk1JxsSIkvAtICRwuLq1kYiKG5qxvwg3lR7dJABJViVuHQcwpGyvHBulDS28DLDb8yfYuBgDkop+fmGsCyUYpqjokB5gAjoq73yjl0tGDdzZDrJka+v/Ok+csHjULJIAhaCTvIW6Oopji32b4xqkaV9fOoNYGTl15eKpHGu/T8wosOzG1ynLb1kcZpONBKK8XcxeXnRxNUbyYxLcmzNjgX6XNwK6uPQYhi8/K9v0ZBBb+VJGQCxGFpObXpaADrCqc2OQ+QEEsqUFuB9LGu6ra1EsSkNCqPAh+PdwzIB9550rhhBibkY/Y97+TwdhIfkpaw=" # DOCKER_PASS
+    - COMMIT=${TRAVIS_COMMIT::8}
+
+  after_success:
+    - mvn clean package
+    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+    - export REPO=ancina/gamesimage
+    - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+    - docker build -f Dockerfile -t $REPO:$COMMIT .
+    - docker tag $REPO:$COMMIT $REPO:$TAG
+    - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+    - docker push $REPO
