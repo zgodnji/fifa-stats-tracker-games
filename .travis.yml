@@ -1,0 +1,6 @@
+language: java
+
+script:
+  - mvn clean package
+  - docker build -t "gamesimage" .
+  - docker run -p 8082:8082 gamesimage
