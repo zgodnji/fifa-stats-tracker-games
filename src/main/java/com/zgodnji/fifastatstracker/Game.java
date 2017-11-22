@@ -1,15 +1,18 @@
 package com.zgodnji.fifastatstracker;
 
-import java.util.Date;
-
-
 public class Game {
 
     private String id;
     private String title;
     private String developer;
     private String platform;
-    private Date releaseDate;
+
+    public Game(String id, String title, String developer, String platform) {
+        this.id = id;
+        this.title = title;
+        this.developer = developer;
+        this.platform = platform;
+    }
 
     public String getId() {
         return id;
@@ -43,11 +46,4 @@ public class Game {
         this.platform = platform;
     }
 
-    public Date getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(Date releaseDate) {
-        this.releaseDate = releaseDate;
-    }
 }

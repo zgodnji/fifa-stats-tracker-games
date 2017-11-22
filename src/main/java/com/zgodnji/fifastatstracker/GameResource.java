@@ -13,28 +13,6 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class GameResource {
 
-    @Inject
-    private GameProperties properties;
-
-    @GET
-    @Path("test")
-    public Response testResponse() {
-        String response =
-                "{" +
-                        "\"stringProperty\": \"%s\"," +
-                        "\"booleanProperty\": %b," +
-                        "\"integerProperty\": %d" +
-                        "}";
-
-        response = String.format(
-                response,
-                properties.getStringProperty(),
-                properties.getBooleanProperty(),
-                properties.getIntegerProperty());
-
-        return Response.ok(response).build();
-    }
-
     @GET
     public Response getAllGames() {
         List<Game> games = Database.getGames();
@@ -61,6 +39,51 @@ public class GameResource {
     public Response deleteGame(@PathParam("gameId") String gameId) {
         Database.deleteGame(gameId);
         return Response.noContent().build();
+    }
 
+    @GET
+    @Path("create")
+    public Response fillDatabase() {
+        Database.addGame(new Game(
+                "1",
+                "Fifa 17",
+                "EA sports",
+                "PS4"
+        ));
+        Database.addGame(new Game(
+                "2",
+                "Fifa 18",
+                "EA sports",
+                "XBOX ONE"
+        ));
+        Database.addGame(new Game(
+                "3",
+                "PES 18",
+                "Konami",
+                "PS4"
+        ));
+        return Response.noContent().build();
+    }
+
+    @Inject
+    private GameProperties properties;
+
+    @GET
+    @Path("config")
+    public Response getConfig() {
+        String response =
+                "{" +
+                        "\"stringProperty\": \"%s\"," +
+                        "\"booleanProperty\": %b," +
+                        "\"integerProperty\": %d" +
+                        "}";
+
+        response = String.format(
+                response,
+                properties.getStringProperty(),
+                properties.getBooleanProperty(),
+                properties.getIntegerProperty());
+
+        return Response.ok(response).build();
     }
 }
