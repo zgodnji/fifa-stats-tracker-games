@@ -10,6 +10,11 @@ kumuluzee:
   config:
     start-retry-delay-ms: 500
     max-retry-delay-ms: 900000
+  discovery:
+      etcd:
+        hosts: http://192.168.99.100:2370
+      ttl: 30
+      ping-interval: 20
 
 rest-config:
   string-property: Monday
